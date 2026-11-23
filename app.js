@@ -14,6 +14,44 @@ function stopCamera() {
   startCamera.textContent = 'Aktifkan kamera';
 }
 
+function addPhoto(url, label) {
+  const card = document.createElement('figure');
+  card.className = 'tile';
+  card.innerHTML = '<img alt="Foto dari tamu"><figcaption></figcaption>';
+  card.querySelector('img').src = url;
+  card.querySelector('figcaption').textContent = `NEW / ${label}`;
+  document.querySelector('.gallery').prepend(card);
+}
+
+function addWish({ name, message }) {
+  const card = document.createElement('article');
+  card.innerHTML = '<span>"</span><p></p><b></b>';
+  card.querySelector('p').textContent = message;
+  card.querySelector('b').textContent = name;
+  document.querySelector('#wishList').prepend(card);
+}
+
+function toDataUrl(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+async function uploadPhoto(blob, label) {
+  if (blob.size > 5 * 1024 * 1024) throw new Error('Ukuran foto maksimal 5 MB.');
+  const response = await fetch('/api/photos', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ image: await toDataUrl(blob) }),
+  });
+  const result = await response.json();
+  if (!response.ok) throw new Error(result.error || 'Foto gagal disimpan.');
+  addPhoto(result.url, label);
+}
+
 async function enableCamera() {
   if (!navigator.mediaDevices?.getUserMedia) {
     cameraStatus.textContent = 'Browser ini tidak mendukung akses kamera.';
@@ -32,16 +70,6 @@ async function enableCamera() {
   }
 }
 
-function addPhoto(url, label) {
-  const card = document.createElement('figure');
-  card.className = 'tile';
-  card.innerHTML = '<img alt="Foto dari tamu"><figcaption></figcaption>';
-  card.querySelector('img').src = url;
-  card.querySelector('figcaption').textContent = `NEW / ${label}`;
-  document.querySelector('.gallery').prepend(card);
-  document.querySelector('#galeri').scrollIntoView({ behavior: 'smooth', block: 'start' });
-}
-
 document.querySelector('#openCamera').addEventListener('click', () => modal.showModal());
 document.querySelector('#closeCamera').addEventListener('click', () => modal.close());
 modal.addEventListener('close', stopCamera);
@@ -50,32 +78,43 @@ takePhoto.addEventListener('click', () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
   canvas.getContext('2d').drawImage(video, 0, 0);
-  canvas.toBlob((blob) => {
+  canvas.toBlob(async (blob) => {
     if (!blob) return;
-    addPhoto(URL.createObjectURL(blob), 'Captured now');
-    stopCamera();
-    modal.close();
-  }, 'image/jpeg', .9);
+    try {
+      cameraStatus.textContent = 'Menyimpan foto...';
+      await uploadPhoto(blob, 'Captured now');
+      stopCamera();
+      modal.close();
+      document.querySelector('#galeri').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } catch (error) { cameraStatus.textContent = error.message; }
+  }, 'image/jpeg', .85);
 });
-document.querySelector('#photoUpload').addEventListener('change', (event) => {
+document.querySelector('#photoUpload').addEventListener('change', async (event) => {
   const [file] = event.target.files;
   if (!file) return;
-  addPhoto(URL.createObjectURL(file), 'From gallery');
-  modal.close();
+  try {
+    cameraStatus.textContent = 'Menyimpan foto...';
+    await uploadPhoto(file, 'From gallery');
+    modal.close();
+    document.querySelector('#galeri').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  } catch (error) { cameraStatus.textContent = error.message; }
   event.target.value = '';
 });
 document.querySelector('#soundToggle').addEventListener('click', (event) => {
   const label = event.currentTarget.querySelector('span');
   label.textContent = label.textContent === 'Sound on' ? 'Sound off' : 'Sound on';
 });
-document.querySelector('#wishForm').addEventListener('submit', (event) => {
+document.querySelector('#wishForm').addEventListener('submit', async (event) => {
   event.preventDefault();
   const name = document.querySelector('#name');
   const message = document.querySelector('#message');
-  const card = document.createElement('article');
-  card.innerHTML = '<span>"</span><p></p><b></b>';
-  card.querySelector('p').textContent = message.value;
-  card.querySelector('b').textContent = name.value;
-  document.querySelector('#wishList').prepend(card);
+  const response = await fetch('/api/wishes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: name.value, message: message.value }) });
+  const result = await response.json();
+  if (!response.ok) return;
+  addWish(result);
   event.currentTarget.reset();
 });
+Promise.all([fetch('/api/photos').then((response) => response.json()), fetch('/api/wishes').then((response) => response.json())]).then(([photos, wishes]) => {
+  photos.reverse().forEach((photo) => addPhoto(photo.url, 'Guest memory'));
+  wishes.reverse().forEach(addWish);
+}).catch(() => {});

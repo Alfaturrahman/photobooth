@@ -19,3 +19,9 @@ async function loadGallery() { $('galleryStatus').textContent = 'Memuat album...
 async function loadWishes() { try { const response = await fetch('/api/wishes'); const wishes = await response.json(); wishes.reverse().forEach(addWish); } catch {} }
 $('refreshGallery').addEventListener('click', loadGallery); $('wishForm').addEventListener('submit', async (event) => { event.preventDefault(); const response = await fetch('/api/wishes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: $('name').value, message: $('message').value }) }); if (!response.ok) return; addWish(await response.json()); event.currentTarget.reset(); });
 $('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`; loadGallery(); loadWishes();
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
+    if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); }
+  }), { threshold: .16 });
+  document.querySelectorAll('.how,.booth,.album,.salams').forEach((section) => { section.classList.add('reveal-section'); observer.observe(section); });
+}

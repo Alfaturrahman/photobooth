@@ -13,22 +13,27 @@
   <body>
     <div class="grain"></div>
     <header class="topbar">
-      <a class="brand" href="#beranda">R<span>&amp;</span>A</a>
-      <nav><a href="#cerita">Cerita</a><a href="#galeri">Galeri</a><a href="#ucapan">Ucapan</a></nav>
+      <a class="brand" href="#beranda">PHOTOB<span>UM</span></a>
+      <nav><a href="#cara-kerja">Cara kerja</a><a href="#galeri">Galeri</a><a href="#ucapan">Salam</a></nav>
       <button class="sound" id="soundToggle" aria-label="Putar musik">♪ <span>Sound on</span></button>
     </header>
 
     <main id="beranda">
       <section class="hero">
         <div class="hero-copy reveal">
-          <p class="eyebrow">THE WEDDING CELEBRATION OF</p>
-          <h1>Raya <i>&amp;</i> Arka</h1>
-          <p class="date">SABTU, 14 NOVEMBER 2026 · JAKARTA</p>
-          <a class="button light" href="#galeri">Lihat kenangan <span>↓</span></a>
+          <p class="eyebrow">PHOTOBOOTH DIGITAL · RAYA & ARKA</p>
+          <h1>Semua<br /><i>terpotret,</i><br />tanpa antre.</h1>
+          <p class="date">AMBIL FOTO, KIRIM SALAM, JADI BAGIAN DARI CERITA KAMI.</p>
+          <button class="button light" id="heroCamera">Mulai foto <span>→</span></button>
         </div>
-        <div class="hero-photo reveal"><img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=1400&q=90" alt="Pasangan pengantin berpegangan tangan" /></div>
-        <div class="hero-mark">FOREVER<br />STARTS<br />HERE</div>
-        <p class="scroll">SCROLL TO DISCOVER <span>↓</span></p>
+        <div class="hero-photo reveal"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1400&q=90" alt="Tamu merayakan acara" /></div>
+        <div class="hero-mark">CAPTURE<br />THE<br />LOVE</div>
+        <p class="scroll">AMBIL MOMENMU <span>↓</span></p>
+      </section>
+
+      <section class="scan" id="cara-kerja">
+        <div><p class="eyebrow">SATU LINK, BANYAK KENANGAN</p><h2>Scan, foto,<br /><i>kirim salam.</i></h2><p>Buka halaman ini dari HP mana pun. Tidak perlu unduh aplikasi dan semua tamu bisa mengambil foto pada waktu bersamaan.</p><button class="button dark" id="scanCamera">Buka kamera <span>→</span></button></div>
+        <div class="qr-card"><img id="qrCode" alt="QR code untuk halaman photobooth" /><small>SCAN UNTUK IKUT BERBAGI MOMEN</small></div>
       </section>
 
       <section class="intro" id="cerita">

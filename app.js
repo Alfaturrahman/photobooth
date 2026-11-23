@@ -71,6 +71,8 @@ async function enableCamera() {
 }
 
 document.querySelector('#openCamera').addEventListener('click', () => modal.showModal());
+document.querySelector('#heroCamera').addEventListener('click', () => modal.showModal());
+document.querySelector('#scanCamera').addEventListener('click', () => modal.showModal());
 document.querySelector('#closeCamera').addEventListener('click', () => modal.close());
 modal.addEventListener('close', stopCamera);
 startCamera.addEventListener('click', enableCamera);
@@ -118,3 +120,5 @@ Promise.all([fetch('/api/photos').then((response) => response.json()), fetch('/a
   photos.reverse().forEach((photo) => addPhoto(photo.url, 'Guest memory'));
   wishes.reverse().forEach(addWish);
 }).catch(() => {});
+
+document.querySelector('#qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`;

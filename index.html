@@ -71,7 +71,7 @@
     </main>
 
     <footer><div class="brand">R<span>&amp;</span>A</div><p>DIBUAT UNTUK MENYIMPAN YANG BERHARGA</p><small>© 2026 RAYA & ARKA</small></footer>
-    <dialog id="cameraModal"><button class="close" id="closeCamera" aria-label="Tutup">×</button><p class="eyebrow">CAPTURE A MEMORY</p><h2>Bagikan momenmu.</h2><p>Versi demo. Sambungkan upload storage dan kamera perangkat saat backend siap.</p><label class="upload"><input type="file" accept="image/*" capture="environment" /> Pilih foto <span>↑</span></label></dialog>
+    <dialog id="cameraModal"><button class="close" id="closeCamera" aria-label="Tutup">x</button><p class="eyebrow">CAPTURE A MEMORY</p><h2>Bagikan momenmu.</h2><p id="cameraStatus">Izinkan kamera untuk mengabadikan momen.</p><div class="camera-stage"><video id="cameraPreview" autoplay playsinline muted></video><canvas id="cameraCanvas" hidden></canvas><div class="camera-empty">Kamera belum aktif</div></div><div class="camera-actions"><button class="button dark" id="startCamera" type="button">Aktifkan kamera</button><button class="shutter" id="takePhoto" type="button" disabled aria-label="Ambil foto"><span></span></button></div><label class="upload">Pilih dari galeri <input id="photoUpload" type="file" accept="image/*" /></label></dialog>
     <script src="app.js"></script>
   </body>
 </html>

@@ -21,6 +21,8 @@ async function initDatabase() {
       message TEXT NOT NULL CHECK (char_length(message) BETWEEN 1 AND 500),
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+    ALTER TABLE photos ADD COLUMN IF NOT EXISTS guest_name TEXT;
+    ALTER TABLE photos ADD COLUMN IF NOT EXISTS message TEXT;
   `);
 }
 
@@ -70,12 +72,12 @@ async function handler(req, res) {
     return rows[0] ? send(res, 200, rows[0].image, rows[0].mime_type) : send(res, 404, { error: 'Not found' });
   }
   if (req.method === 'POST' && url.pathname === '/api/photos') {
-    const { image } = await readJson(req);
+    const { image, guestName = '', message = '' } = await readJson(req);
     const match = typeof image === 'string' && image.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     if (!match) return send(res, 400, { error: 'Foto harus JPEG, PNG, atau WebP.' });
     const binary = Buffer.from(match[2], 'base64');
     if (!binary.length || binary.length > maxPhotoBytes) return send(res, 413, { error: 'Ukuran foto maksimal 5 MB.' });
-    const { rows } = await pool.query('INSERT INTO photos (image, mime_type) VALUES ($1, $2) RETURNING id', [binary, match[1]]);
+    const { rows } = await pool.query('INSERT INTO photos (image, mime_type, guest_name, message) VALUES ($1, $2, $3, $4) RETURNING id', [binary, match[1], String(guestName).trim().slice(0, 80), String(message).trim().slice(0, 500)]);
     return send(res, 201, { id: rows[0].id, url: `/api/photos/${rows[0].id}` });
   }
   if (req.method === 'GET' && url.pathname === '/api/wishes') {

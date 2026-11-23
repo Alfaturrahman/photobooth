@@ -23,6 +23,8 @@ async function initDatabase() {
     );
     ALTER TABLE photos ADD COLUMN IF NOT EXISTS guest_name TEXT;
     ALTER TABLE photos ADD COLUMN IF NOT EXISTS message TEXT;
+    ALTER TABLE photos ADD COLUMN IF NOT EXISTS guest_key TEXT;
+    CREATE INDEX IF NOT EXISTS photos_guest_key_created_at_idx ON photos (guest_key, created_at DESC);
   `);
 }
 
@@ -64,20 +66,24 @@ async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ok: true });
   if (req.method === 'GET' && url.pathname === '/api/photos') {
-    const { rows } = await pool.query('SELECT id, created_at FROM photos ORDER BY id DESC LIMIT 100');
+    const { rows } = await pool.query('SELECT id, guest_name, guest_key, created_at FROM photos ORDER BY id DESC LIMIT 100');
     return send(res, 200, rows.map((row) => ({ id: row.id, url: `/api/photos/${row.id}`, createdAt: row.created_at })));
+  }
+  if (req.method === 'GET' && url.pathname === '/api/guest-galleries') {
+    const { rows } = await pool.query(`SELECT guest_key, COALESCE(NULLIF(guest_name, ''), 'Tamu') AS guest_name, COUNT(*)::int AS photo_count, MAX(created_at) AS updated_at FROM photos WHERE guest_key IS NOT NULL AND guest_key <> '' GROUP BY guest_key, COALESCE(NULLIF(guest_name, ''), 'Tamu') ORDER BY updated_at DESC LIMIT 100`);
+    return send(res, 200, rows);
   }
   if (req.method === 'GET' && /^\/api\/photos\/\d+$/.test(url.pathname)) {
     const { rows } = await pool.query('SELECT image, mime_type FROM photos WHERE id = $1', [url.pathname.split('/').pop()]);
     return rows[0] ? send(res, 200, rows[0].image, rows[0].mime_type) : send(res, 404, { error: 'Not found' });
   }
   if (req.method === 'POST' && url.pathname === '/api/photos') {
-    const { image, guestName = '', message = '' } = await readJson(req);
+    const { image, guestName = '', guestKey = '', message = '' } = await readJson(req);
     const match = typeof image === 'string' && image.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
     if (!match) return send(res, 400, { error: 'Foto harus JPEG, PNG, atau WebP.' });
     const binary = Buffer.from(match[2], 'base64');
     if (!binary.length || binary.length > maxPhotoBytes) return send(res, 413, { error: 'Ukuran foto maksimal 5 MB.' });
-    const { rows } = await pool.query('INSERT INTO photos (image, mime_type, guest_name, message) VALUES ($1, $2, $3, $4) RETURNING id', [binary, match[1], String(guestName).trim().slice(0, 80), String(message).trim().slice(0, 500)]);
+    const { rows } = await pool.query('INSERT INTO photos (image, mime_type, guest_name, guest_key, message) VALUES ($1, $2, $3, $4, $5) RETURNING id', [binary, match[1], String(guestName).trim().slice(0, 80), String(guestKey).trim().slice(0, 80), String(message).trim().slice(0, 500)]);
     return send(res, 201, { id: rows[0].id, url: `/api/photos/${rows[0].id}` });
   }
   if (req.method === 'GET' && url.pathname === '/api/wishes') {

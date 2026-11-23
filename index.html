@@ -1,82 +1,9 @@
-<!doctype html>
-<html lang="id">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#1d332d" />
-    <title>Raya & Arka | Celebration Archive</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="grain"></div>
-    <header class="topbar">
-      <a class="brand" href="#beranda">PHOTOB<span>UM</span></a>
-      <nav><a href="#cara-kerja">Cara kerja</a><a href="#galeri">Galeri</a><a href="#ucapan">Salam</a></nav>
-      <button class="sound" id="soundToggle" aria-label="Putar musik">♪ <span>Sound on</span></button>
-    </header>
-
-    <main id="beranda">
-      <section class="hero">
-        <div class="hero-copy reveal">
-          <p class="eyebrow">PHOTOBOOTH DIGITAL · RAYA & ARKA</p>
-          <h1>Semua<br /><i>terpotret,</i><br />tanpa antre.</h1>
-          <p class="date">AMBIL FOTO, KIRIM SALAM, JADI BAGIAN DARI CERITA KAMI.</p>
-          <button class="button light" id="heroCamera">Mulai foto <span>→</span></button>
-        </div>
-        <div class="hero-photo reveal"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1400&q=90" alt="Tamu merayakan acara" /></div>
-        <div class="hero-mark">CAPTURE<br />THE<br />LOVE</div>
-        <p class="scroll">AMBIL MOMENMU <span>↓</span></p>
-      </section>
-
-      <section class="scan" id="cara-kerja">
-        <div><p class="eyebrow">SATU LINK, BANYAK KENANGAN</p><h2>Scan, foto,<br /><i>kirim salam.</i></h2><p>Buka halaman ini dari HP mana pun. Tidak perlu unduh aplikasi dan semua tamu bisa mengambil foto pada waktu bersamaan.</p><button class="button dark" id="scanCamera">Buka kamera <span>→</span></button></div>
-        <div class="qr-card"><img id="qrCode" alt="QR code untuk halaman photobooth" /><small>SCAN UNTUK IKUT BERBAGI MOMEN</small></div>
-      </section>
-
-      <section class="intro" id="cerita">
-        <p class="eyebrow">A SMALL NOTE</p>
-        <h2>Hari terbaik kami,<br /><i>dibuat hangat oleh kalian.</i></h2>
-        <p class="lead">Bukan cuma perayaan cinta kami. Ini adalah kumpulan tawa, pelukan, dan momen kecil yang ingin kami simpan selamanya.</p>
-        <div class="intro-stamp">14<br /><small>NOV</small><br />26</div>
-      </section>
-
-      <section class="event">
-        <div class="event-photo"><img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=1000&q=85" alt="Detail dekorasi acara" /></div>
-        <div class="event-copy">
-          <p class="eyebrow">SAVE THE MOMENT</p>
-          <h2>Datang untuk<br /><i>merayakan.</i></h2>
-          <div class="event-details"><p><b>AKAD & RESEPSI</b><br />Sabtu, 14 November 2026<br />10.00 WIB hingga selesai</p><p><b>THE LANGHAM</b><br />District 8, SCBD<br />Jakarta Selatan</p></div>
-          <a class="text-link" href="https://maps.google.com" target="_blank" rel="noreferrer">Buka peta <span>↗</span></a>
-        </div>
-      </section>
-
-      <section class="memory" id="galeri">
-        <div class="section-head"><div><p class="eyebrow">MEMORY ARCHIVE</p><h2>Potongan hari<br /><i>yang tak terlupa.</i></h2></div><button class="button dark" id="openCamera">+ Tambah momen</button></div>
-        <div class="gallery">
-          <figure class="tile tall"><img src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=900&q=85" alt="Tamu di pesta" /><figcaption>01 / Warm wishes</figcaption></figure>
-          <figure class="tile"><img src="https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=900&q=85" alt="Momen resepsi" /><figcaption>02 / The table</figcaption></figure>
-          <figure class="tile"><img src="https://images.unsplash.com/photo-1507504031003-b417219a0fde?auto=format&fit=crop&w=900&q=85" alt="Bunga pernikahan" /><figcaption>03 / In bloom</figcaption></figure>
-          <figure class="tile wide"><img src="https://images.unsplash.com/photo-1544078751-58fee2d8a03b?auto=format&fit=crop&w=1200&q=85" alt="Momen pernikahan" /><figcaption>04 / Golden hour</figcaption></figure>
-        </div>
-      </section>
-
-      <section class="wishes" id="ucapan">
-        <p class="eyebrow">LOVE NOTES</p>
-        <h2>Ucapan dari<br /><i>orang tersayang.</i></h2>
-        <div class="wish-grid" id="wishList">
-          <article><span>“</span><p>Semoga setiap harinya dipenuhi cerita yang sama indahnya dengan hari ini.</p><b>Nadia & Rafi</b></article>
-          <article><span>“</span><p>One for the books. Terima kasih sudah mengajak kami jadi bagian dari cerita kalian.</p><b>Fina, Dita, Lala</b></article>
-          <article><span>“</span><p>Untuk dua manusia favorit kami, selamat menempuh petualangan paling seru.</p><b>Keluarga Pratama</b></article>
-        </div>
-        <form id="wishForm"><input id="name" aria-label="Nama" placeholder="Nama kamu" required /><input id="message" aria-label="Ucapan" placeholder="Tulis ucapan singkat" required /><button class="button dark">Kirim ucapan <span>→</span></button></form>
-      </section>
-    </main>
-
-    <footer><div class="brand">R<span>&amp;</span>A</div><p>DIBUAT UNTUK MENYIMPAN YANG BERHARGA</p><small>© 2026 RAYA & ARKA</small></footer>
-    <dialog id="cameraModal"><button class="close" id="closeCamera" aria-label="Tutup">x</button><p class="eyebrow">CAPTURE A MEMORY</p><h2>Bagikan momenmu.</h2><p id="cameraStatus">Izinkan kamera untuk mengabadikan momen.</p><div class="camera-stage"><video id="cameraPreview" autoplay playsinline muted></video><canvas id="cameraCanvas" hidden></canvas><div class="camera-empty">Kamera belum aktif</div></div><div class="camera-actions"><button class="button dark" id="startCamera" type="button">Aktifkan kamera</button><button class="shutter" id="takePhoto" type="button" disabled aria-label="Ambil foto"><span></span></button></div><label class="upload">Pilih dari galeri <input id="photoUpload" type="file" accept="image/*" /></label></dialog>
-    <script src="app.js"></script>
-  </body>
-</html>
+<!doctype html><html lang="id"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#351916"><title>Rafid & Vista | Virtual Photobooth</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css"></head><body>
+<header><a class="wordmark" href="#home">R<span>&</span>V</a><p>VIRTUAL PHOTOBOOTH</p><button id="openInfo">INFO</button></header>
+<main id="home"><section class="cover"><div class="cover-art" aria-hidden="true"></div><div class="cover-copy"><p class="eyebrow">SCAN · SNAP · SHARE</p><h1>Rafid <i>&</i> Vista</h1><p class="sub">Satu senyum, sejuta kenangan.</p><button class="primary" id="openCamera">Abadikan momen <span>→</span></button></div><p class="cover-bottom">SABTU · 14 NOVEMBER 2026 · JAKARTA</p></section>
+<section class="how"><p class="eyebrow">HOW IT WORKS</p><h2>Semua terpotret,<br><i>tanpa antre.</i></h2><p class="intro">Buka dari HP kamu, ambil foto, lalu kirimkan ke album bersama. Tanpa aplikasi, tanpa daftar.</p><div class="steps"><article><b>01</b><h3>Buka kamera</h3><p>Gunakan kamera HP atau pilih dari galeri.</p></article><article><b>02</b><h3>Bikin versimu</h3><p>Pilih nuansa, ambil pose terbaik, dan pakai frame kami.</p></article><article><b>03</b><h3>Kirim salam</h3><p>Foto langsung jadi bagian dari album hari ini.</p></article></div></section>
+<section class="booth" id="booth"><div><p class="eyebrow">YOUR LITTLE KEEPSAKE</p><h2>Yuk, abadikan<br><i>senyummu.</i></h2><p>Setiap foto akan dibingkai khusus untuk hari bahagia kami.</p><button class="primary dark" id="openCameraAgain">Mulai foto <span>→</span></button></div><div class="qr"><img id="qrCode" alt="QR Code photobooth"><small>SCAN UNTUK IKUT BERBAGI MOMEN</small></div></section>
+<section class="album" id="galeri"><div class="album-head"><div><p class="eyebrow">OUR SHARED MEMORIES</p><h2>Kenangan<br><i>bersama.</i></h2></div><button id="refreshGallery" class="text-button">Segarkan album ↻</button></div><p id="galleryStatus" class="status">Memuat album...</p><div id="gallery" class="gallery"></div></section>
+<section class="salams"><p class="eyebrow">LEAVE A LITTLE LOVE</p><h2>Sampaikan<br><i>salam hangat.</i></h2><form id="wishForm"><input id="name" placeholder="Nama kamu" maxlength="80" required><textarea id="message" placeholder="Tulis ucapan untuk Rafid & Vista" maxlength="500" required></textarea><button class="primary">Kirim salam <span>→</span></button></form><div id="wishList" class="wishes"></div></section></main>
+<footer><div class="wordmark">R<span>&</span>V</div><p>TERIMA KASIH SUDAH MENJADI BAGIAN DARI CERITA KAMI</p></footer>
+<dialog id="cameraModal"><button class="close" id="closeCamera" aria-label="Tutup">×</button><div id="cameraView"><p class="eyebrow">CAMERA READY</p><h2>Ambil momenmu.</h2><p id="cameraStatus" class="dialog-copy">Izinkan akses kamera untuk mulai.</p><div class="viewfinder"><video id="cameraPreview" autoplay playsinline muted></video><canvas id="cameraCanvas" hidden></canvas><div class="frame"><b>RAFID <i>&</i> VISTA</b><small>14 · 11 · 2026</small></div></div><div class="filter-row" role="group" aria-label="Pilih nuansa foto"><button class="filter active" data-filter="none">Natural</button><button class="filter" data-filter="warm">Warm</button><button class="filter" data-filter="mono">Mono</button></div><div class="camera-actions"><button class="text-button" id="startCamera" type="button">Aktifkan kamera</button><button class="shutter" id="takePhoto" type="button" disabled aria-label="Ambil foto"><span></span></button><label class="text-button">Pilih foto<input id="photoUpload" type="file" accept="image/jpeg,image/png,image/webp" hidden></label></div></div><div id="reviewView" hidden><p class="eyebrow">YOUR LITTLE KEEPSAKE</p><h2>Simpan senyum<br>hari ini.</h2><img id="resultPhoto" alt="Hasil foto"><div class="review-form"><input id="photoName" placeholder="Nama kamu (opsional)" maxlength="80"><textarea id="photoMessage" placeholder="Tinggalkan salam singkat (opsional)" maxlength="500"></textarea><label><input id="consent" type="checkbox"> Saya setuju foto tampil di album bersama.</label></div><p id="uploadStatus" class="status"></p><div class="review-actions"><button class="text-button" id="retake" type="button">↻ Foto lagi</button><button class="primary" id="publish" type="button" disabled>Publikasikan <span>♡</span></button></div></div></dialog><script src="app.js"></script></body></html>

@@ -1,124 +1,21 @@
-const modal = document.querySelector('#cameraModal');
-const video = document.querySelector('#cameraPreview');
-const canvas = document.querySelector('#cameraCanvas');
-const startCamera = document.querySelector('#startCamera');
-const takePhoto = document.querySelector('#takePhoto');
-const cameraStatus = document.querySelector('#cameraStatus');
-let stream;
-
-function stopCamera() {
-  stream?.getTracks().forEach((track) => track.stop());
-  stream = undefined;
-  video.srcObject = null;
-  takePhoto.disabled = true;
-  startCamera.textContent = 'Aktifkan kamera';
-}
-
-function addPhoto(url, label) {
-  const card = document.createElement('figure');
-  card.className = 'tile';
-  card.innerHTML = '<img alt="Foto dari tamu"><figcaption></figcaption>';
-  card.querySelector('img').src = url;
-  card.querySelector('figcaption').textContent = `NEW / ${label}`;
-  document.querySelector('.gallery').prepend(card);
-}
-
-function addWish({ name, message }) {
-  const card = document.createElement('article');
-  card.innerHTML = '<span>"</span><p></p><b></b>';
-  card.querySelector('p').textContent = message;
-  card.querySelector('b').textContent = name;
-  document.querySelector('#wishList').prepend(card);
-}
-
-function toDataUrl(blob) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
-async function uploadPhoto(blob, label) {
-  if (blob.size > 5 * 1024 * 1024) throw new Error('Ukuran foto maksimal 5 MB.');
-  const response = await fetch('/api/photos', {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ image: await toDataUrl(blob) }),
-  });
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.error || 'Foto gagal disimpan.');
-  addPhoto(result.url, label);
-}
-
-async function enableCamera() {
-  if (!navigator.mediaDevices?.getUserMedia) {
-    cameraStatus.textContent = 'Browser ini tidak mendukung akses kamera.';
-    return;
-  }
-  try {
-    stopCamera();
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
-    video.srcObject = stream;
-    await video.play();
-    takePhoto.disabled = false;
-    startCamera.textContent = 'Ganti kamera';
-    cameraStatus.textContent = 'Siap. Cari momen terbaik, lalu tekan tombol foto.';
-  } catch {
-    cameraStatus.textContent = 'Kamera tidak bisa diakses. Izinkan kamera atau pilih foto dari galeri.';
-  }
-}
-
-document.querySelector('#openCamera').addEventListener('click', () => modal.showModal());
-document.querySelector('#heroCamera').addEventListener('click', () => modal.showModal());
-document.querySelector('#scanCamera').addEventListener('click', () => modal.showModal());
-document.querySelector('#closeCamera').addEventListener('click', () => modal.close());
-modal.addEventListener('close', stopCamera);
-startCamera.addEventListener('click', enableCamera);
-takePhoto.addEventListener('click', () => {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  canvas.toBlob(async (blob) => {
-    if (!blob) return;
-    try {
-      cameraStatus.textContent = 'Menyimpan foto...';
-      await uploadPhoto(blob, 'Captured now');
-      stopCamera();
-      modal.close();
-      document.querySelector('#galeri').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    } catch (error) { cameraStatus.textContent = error.message; }
-  }, 'image/jpeg', .85);
-});
-document.querySelector('#photoUpload').addEventListener('change', async (event) => {
-  const [file] = event.target.files;
-  if (!file) return;
-  try {
-    cameraStatus.textContent = 'Menyimpan foto...';
-    await uploadPhoto(file, 'From gallery');
-    modal.close();
-    document.querySelector('#galeri').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  } catch (error) { cameraStatus.textContent = error.message; }
-  event.target.value = '';
-});
-document.querySelector('#soundToggle').addEventListener('click', (event) => {
-  const label = event.currentTarget.querySelector('span');
-  label.textContent = label.textContent === 'Sound on' ? 'Sound off' : 'Sound on';
-});
-document.querySelector('#wishForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const name = document.querySelector('#name');
-  const message = document.querySelector('#message');
-  const response = await fetch('/api/wishes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: name.value, message: message.value }) });
-  const result = await response.json();
-  if (!response.ok) return;
-  addWish(result);
-  event.currentTarget.reset();
-});
-Promise.all([fetch('/api/photos').then((response) => response.json()), fetch('/api/wishes').then((response) => response.json())]).then(([photos, wishes]) => {
-  photos.reverse().forEach((photo) => addPhoto(photo.url, 'Guest memory'));
-  wishes.reverse().forEach(addWish);
-}).catch(() => {});
-
-document.querySelector('#qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`;
+const $ = (id) => document.getElementById(id);
+const modal = $('cameraModal'); let stream; let filter = 'none'; let photoBlob;
+const filterValues = { none: 'none', warm: 'sepia(.25) saturate(1.15)', mono: 'grayscale(1) contrast(1.1)' };
+function stop() { stream?.getTracks().forEach((track) => track.stop()); stream = undefined; $('cameraPreview').srcObject = null; $('takePhoto').disabled = true; }
+function openCamera() { modal.showModal(); $('cameraView').hidden = false; $('reviewView').hidden = true; }
+async function startCamera() { try { stop(); stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'user' }, width: { ideal: 1080 }, height: { ideal: 1350 } }, audio: false }); $('cameraPreview').srcObject = stream; await $('cameraPreview').play(); $('takePhoto').disabled = false; $('cameraStatus').textContent = 'Siap. Pilih nuansa dan ambil pose terbaikmu.'; } catch { $('cameraStatus').textContent = 'Kamera belum tersedia. Izinkan akses atau pilih foto dari galeri.'; } }
+function review(blob) { photoBlob = blob; $('resultPhoto').src = URL.createObjectURL(blob); $('cameraView').hidden = true; $('reviewView').hidden = false; stop(); }
+async function dataUrl(blob) { return await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(blob); }); }
+function addPhoto(url) { const item = document.createElement('article'); item.className = 'photo'; item.innerHTML = '<img alt="Kenangan tamu">'; item.querySelector('img').src = url; $('gallery').prepend(item); }
+function addWish(item) { const card = document.createElement('article'); card.className = 'wish'; card.innerHTML = '<p></p><b></b>'; card.querySelector('p').textContent = `“${item.message}”`; card.querySelector('b').textContent = item.name; $('wishList').prepend(card); }
+['openCamera','openCameraAgain','heroCamera','scanCamera'].forEach((id) => $(id)?.addEventListener('click', openCamera));
+$('closeCamera').addEventListener('click', () => modal.close()); modal.addEventListener('close', stop); $('startCamera').addEventListener('click', startCamera);
+document.querySelectorAll('.filter').forEach((button) => button.addEventListener('click', () => { filter = button.dataset.filter; $('cameraPreview').style.filter = filterValues[filter]; document.querySelectorAll('.filter').forEach((item) => item.classList.toggle('active', item === button)); }));
+$('takePhoto').addEventListener('click', () => { const video = $('cameraPreview'), canvas = $('cameraCanvas'), context = canvas.getContext('2d'); canvas.width = video.videoWidth; canvas.height = video.videoHeight; context.filter = filterValues[filter]; context.drawImage(video, 0, 0); context.filter = 'none'; context.strokeStyle = '#f5e7cf'; context.lineWidth = Math.max(8, canvas.width * .012); context.strokeRect(22, 22, canvas.width - 44, canvas.height - 44); context.fillStyle = '#fff'; context.font = `italic ${Math.max(25, canvas.width * .04)}px serif`; context.textAlign = 'center'; context.fillText('Rafid & Vista', canvas.width / 2, canvas.height - 55); canvas.toBlob(review, 'image/jpeg', .88); });
+$('photoUpload').addEventListener('change', (event) => { const file = event.target.files[0]; if (file) review(file); event.target.value = ''; });
+$('consent').addEventListener('change', (event) => { $('publish').disabled = !event.target.checked; }); $('retake').addEventListener('click', () => { $('cameraView').hidden = false; $('reviewView').hidden = true; startCamera(); });
+$('publish').addEventListener('click', async () => { try { $('publish').disabled = true; $('uploadStatus').textContent = 'Menyimpan ke album...'; const response = await fetch('/api/photos', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ image: await dataUrl(photoBlob) }) }); const result = await response.json(); if (!response.ok) throw new Error(result.error); addPhoto(result.url); $('uploadStatus').textContent = 'Sudah tampil di album. Terima kasih!'; setTimeout(() => modal.close(), 1000); } catch (error) { $('uploadStatus').textContent = error.message || 'Foto gagal disimpan.'; $('publish').disabled = false; } });
+async function loadGallery() { $('galleryStatus').textContent = 'Memuat album...'; try { const response = await fetch('/api/photos'); const photos = await response.json(); $('gallery').replaceChildren(); photos.reverse().forEach((photo) => addPhoto(photo.url)); $('galleryStatus').textContent = photos.length ? `${photos.length} kenangan tersimpan` : 'Belum ada foto. Jadilah yang pertama.'; } catch { $('galleryStatus').textContent = 'Album belum bisa dimuat.'; } }
+async function loadWishes() { try { const response = await fetch('/api/wishes'); const wishes = await response.json(); wishes.reverse().forEach(addWish); } catch {} }
+$('refreshGallery').addEventListener('click', loadGallery); $('wishForm').addEventListener('submit', async (event) => { event.preventDefault(); const response = await fetch('/api/wishes', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ name: $('name').value, message: $('message').value }) }); if (!response.ok) return; addWish(await response.json()); event.currentTarget.reset(); });
+$('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`; loadGallery(); loadWishes();

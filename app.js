@@ -3,9 +3,9 @@ const guestKey = localStorage.getItem('garden_guest_key') || crypto.randomUUID()
 localStorage.setItem('garden_guest_key', guestKey);
 const modal = $('cameraModal'); let stream; let filter = 'none'; let photoBlob; let facing = 'user'; let flashOn = false; let audioContext;
 const filterValues = { none: 'none', warm: 'sepia(.25) saturate(1.18) contrast(1.03)', chrome: 'saturate(1.45) contrast(1.16) brightness(1.06)', retro: 'sepia(.48) saturate(.82) contrast(.9)', mono: 'grayscale(1) contrast(1.18)' };
-function stop() { stream?.getTracks().forEach((track) => track.stop()); stream = undefined; $('cameraPreview').srcObject = null; $('takePhoto').disabled = true; }
+function stop() { stream?.getTracks().forEach((track) => track.stop()); stream = undefined; $('cameraPreview').srcObject = null; $('cameraPlaceholder').hidden = false; $('takePhoto').disabled = true; $('startCamera').textContent = 'Aktifkan kamera'; }
 function openCamera() { modal.showModal(); $('cameraView').hidden = false; $('reviewView').hidden = true; }
-async function startCamera() { try { stop(); stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1080 }, height: { ideal: 1350 } }, audio: false }); $('cameraPreview').srcObject = stream; await $('cameraPreview').play(); $('takePhoto').disabled = false; $('cameraStatus').textContent = 'Siap. Pilih nuansa dan ambil pose terbaikmu.'; } catch { $('cameraStatus').textContent = 'Kamera belum tersedia. Izinkan akses atau pilih foto dari galeri.'; } }
+async function startCamera() { try { stop(); stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: facing }, width: { ideal: 1080 }, height: { ideal: 1350 } }, audio: false }); $('cameraPreview').srcObject = stream; await $('cameraPreview').play(); $('cameraPlaceholder').hidden = true; $('takePhoto').disabled = false; $('startCamera').textContent = 'Kamera aktif'; $('cameraStatus').textContent = 'Siap. Pilih nuansa dan ambil pose terbaikmu.'; } catch { $('cameraStatus').textContent = 'Kamera belum tersedia. Izinkan akses atau pilih foto dari galeri.'; } }
 function review(blob) { photoBlob = blob; $('resultPhoto').src = URL.createObjectURL(blob); $('cameraView').hidden = true; $('reviewView').hidden = false; stop(); }
 function drawGardenFrame(context, width, height) {
   const inset = width * .045;

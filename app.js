@@ -24,6 +24,12 @@ function addWish(item) { const card = document.createElement('article'); card.cl
 ['openCamera','openCameraAgain','heroCamera','scanCamera'].forEach((id) => $(id)?.addEventListener('click', openCamera));
 $('closeCamera').addEventListener('click', () => modal.close()); modal.addEventListener('close', stop); $('startCamera').addEventListener('click', startCamera);
 $('closePhoto').addEventListener('click', () => $('photoDialog').close());
+$('navCamera').addEventListener('click', openCamera);
+$('navGallery').addEventListener('click', () => { document.body.classList.add('gallery-page'); loadGallery(); });
+$('closeGallery').addEventListener('click', () => document.body.classList.remove('gallery-page'));
+$('navInfo').addEventListener('click', () => $('infoDialog').showModal());
+$('closeInfo').addEventListener('click', () => $('infoDialog').close());
+$('copyLink').addEventListener('click', async () => { try { await navigator.clipboard.writeText(location.href); $('copyLink').textContent = 'Link tersalin'; } catch { $('copyLink').textContent = 'Salin link dari address bar'; } });
 document.querySelectorAll('.filter').forEach((button) => button.addEventListener('click', () => { filter = button.dataset.filter; $('cameraPreview').style.filter = filterValues[filter]; document.querySelectorAll('.filter').forEach((item) => item.classList.toggle('active', item === button)); }));
 $('switchCamera').addEventListener('click', () => { facing = facing === 'user' ? 'environment' : 'user'; startCamera(); });
 $('zoomRange').addEventListener('input', async (event) => { const zoom = Number(event.target.value); $('zoomValue').textContent = `${zoom.toFixed(1)}x`; const track = stream?.getVideoTracks()[0]; try { await track?.applyConstraints({ advanced: [{ zoom }] }); } catch { $('cameraPreview').style.transform = `scale(${zoom})`; } });
@@ -35,7 +41,7 @@ $('publish').addEventListener('click', async () => { try { const guestName = $('
 async function loadGallery() { $('galleryStatus').textContent = 'Memuat galerimu...'; try { const response = await fetch('/api/photos', { headers: { 'x-guest-key': guestKey } }); const photos = await response.json(); $('gallery').replaceChildren(); photos.reverse().forEach((photo) => addPhoto({ ...photo, url: `/api/photos/${photo.id}` })); $('galleryStatus').textContent = photos.length ? `${photos.length} / 15 foto di galerimu` : 'Belum ada foto. Mulai koleksimu sekarang.'; } catch { $('galleryStatus').textContent = 'Galeri belum bisa dimuat.'; } }
 $('refreshGallery').addEventListener('click', loadGallery);
 $('musicToggle').addEventListener('click', () => { if (audioContext) { audioContext.close(); audioContext = undefined; $('musicToggle').textContent = 'MUSIC OFF'; $('musicToggle').setAttribute('aria-pressed', 'false'); return; } audioContext = new AudioContext(); const gain = audioContext.createGain(); gain.gain.value = .025; gain.connect(audioContext.destination); [196, 246.94, 293.66].forEach((frequency) => { const oscillator = audioContext.createOscillator(); oscillator.type = 'sine'; oscillator.frequency.value = frequency; oscillator.connect(gain); oscillator.start(); }); $('musicToggle').textContent = 'MUSIC ON'; $('musicToggle').setAttribute('aria-pressed', 'true'); });
-$('photoName').value = localStorage.getItem('garden_guest_name') || ''; $('qrCode').src = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`; loadGallery();
+$('photoName').value = localStorage.getItem('garden_guest_name') || ''; const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(location.href)}`; $('qrCode').src = qrUrl; $('infoQr').src = qrUrl; loadGallery();
 if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
   const observer = new IntersectionObserver((entries) => entries.forEach((entry) => {
     if (entry.isIntersecting) { entry.target.classList.add('in-view'); observer.unobserve(entry.target); }

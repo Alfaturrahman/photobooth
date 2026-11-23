@@ -66,10 +66,16 @@ async function handler(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, { ok: true });
   if (req.method === 'GET' && url.pathname === '/api/photos') {
-    const guestKey = url.searchParams.get('guest');
-    const query = guestKey ? 'SELECT id, guest_name, guest_key, created_at FROM photos WHERE guest_key = $1 ORDER BY id DESC LIMIT 100' : 'SELECT id, guest_name, guest_key, created_at FROM photos ORDER BY id DESC LIMIT 100';
-    const { rows } = await pool.query(query, guestKey ? [guestKey] : []);
+    const guestKey = req.headers['x-guest-key'];
+    if (typeof guestKey !== 'string' || guestKey.length < 16) return send(res, 200, []);
+    const { rows } = await pool.query('SELECT id, guest_name, created_at FROM photos WHERE guest_key = $1 ORDER BY id DESC LIMIT 100', [guestKey]);
     return send(res, 200, rows.map((row) => ({ id: row.id, url: `/api/photos/${row.id}`, createdAt: row.created_at })));
+  }
+  if (req.method === 'DELETE' && /^\/api\/photos\/\d+$/.test(url.pathname)) {
+    const guestKey = req.headers['x-guest-key'];
+    if (typeof guestKey !== 'string' || guestKey.length < 16) return send(res, 403, { error: 'Tidak diizinkan.' });
+    const result = await pool.query('DELETE FROM photos WHERE id = $1 AND guest_key = $2', [url.pathname.split('/').pop(), guestKey]);
+    return result.rowCount ? send(res, 200, { ok: true }) : send(res, 404, { error: 'Foto tidak ditemukan.' });
   }
   if (req.method === 'GET' && url.pathname === '/api/guest-galleries') {
     const { rows } = await pool.query(`SELECT guest_key, COALESCE(NULLIF(guest_name, ''), 'Tamu') AS guest_name, COUNT(*)::int AS photo_count, MAX(created_at) AS updated_at FROM photos WHERE guest_key IS NOT NULL AND guest_key <> '' GROUP BY guest_key, COALESCE(NULLIF(guest_name, ''), 'Tamu') ORDER BY updated_at DESC LIMIT 100`);
